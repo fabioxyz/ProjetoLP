@@ -2,6 +2,19 @@
 #include <stdio.h> 
 #include <ctype.h>  // Para isdigit()
 #define TMAX 50 // maximo tamanho nome
+#include <time.h>
+
+void obterDataAtual(char* buffer, size_t tamanho) {
+    time_t agora;
+    struct tm* tempoLocal;
+
+    // Obter a data e hora atual
+    agora = time(NULL);
+    tempoLocal = localtime(&agora);
+
+    // Formatar a data no formato "dd-mm-yyyy hh:mm"
+    strftime(buffer, tamanho, "%d-%m-%Y %H:%M", tempoLocal);
+}
 
 typedef enum {
     Regular = 1,
@@ -21,7 +34,7 @@ typedef struct {
     char NIF[10];
     float valor_total_compras;
     Tipo_de_cliente tipo;
-    Data_Registro data;
+    char dataCriacao[20]; // Armazena a data e hora no formato "dd-mm-yyyy hh:mm"
 }TCAutomovel;
 
 int validar_data(int dia, int mes, int ano) {
@@ -109,8 +122,16 @@ int MENU() {
         scanf("%d", &opcao);
 
         if (opcao == 0) {
-            printf("\nA sair..\n");
-            break;
+            printf("Certifique se que salvou os dados, deseja sair mesmo assim?\n");
+            printf("0)Para sair  1)Para voltar ao menu\n - ");
+            scanf("%d", &opcao);
+            if (opcao == 0) {
+                printf("\nA sair..\n");
+                break;
+            }
+            else {
+                opcao = 6;
+            }
         }
         else if (opcao > 5 || opcao < 0) {
             printf("\nEscolha apenas opcoes validas!\n\n");
@@ -124,6 +145,9 @@ int MENU() {
 
 int InsereCliente(TCAutomovel Cliente[],int total) {
     int i = total; int certo;
+    char dataAtual[20];
+
+    obterDataAtual(dataAtual, sizeof(dataAtual));
 
     Cliente[i].numero_de_cliente = i + 1;
     printf("\nNumero de Cliente : %03d\n", Cliente[i].numero_de_cliente);
@@ -147,7 +171,7 @@ int InsereCliente(TCAutomovel Cliente[],int total) {
 
     //compras
     do {
-        printf("Valor total de compras : ");
+        printf("Valor total de compras(euros) : ");
         if (scanf("%f", &Cliente[i].valor_total_compras) != 1) {
             printf("Insira uma opcao valida.\n");
         }
@@ -163,17 +187,7 @@ int InsereCliente(TCAutomovel Cliente[],int total) {
         } while (Cliente[i].tipo < 1 || Cliente[i].tipo > 3);
 
         // data
-        do {
-            printf("Data de Registro : ");
-            scanf("%d:%d:%d", &Cliente[i].data.dia_registo,
-                &Cliente[i].data.mes_registo,
-                &Cliente[i].data.ano_registo);
-            certo = validar_data(Cliente[i].data.dia_registo,
-                Cliente[i].data.mes_registo,
-                Cliente[i].data.ano_registo);
-
-            if (certo == 0) printf("Insira uma data valida.\n");
-        } while (certo != 1);
+        snprintf(Cliente[i].dataCriacao, sizeof(Cliente[i].dataCriacao), "%s", dataAtual);
 
         i++;
         printf("\nCliente adicionado com sucesso.\n\n");
@@ -190,9 +204,7 @@ int ListarClientes(TCAutomovel Cliente[], int total) {
         printf("NIF : %s\n", Cliente[i].NIF);
         printf("Valor Total De Compras : %.2f euros\n", Cliente[i].valor_total_compras);
         printf("Tipo De Cliente: %s\n", imprimir_tipo(Cliente[i].tipo));
-        printf("Data De Registo: %02d:%02d:%04d\n\n", Cliente[i].data.dia_registo,
-            Cliente[i].data.mes_registo,
-            Cliente[i].data.ano_registo);
+        printf("Data De Registo: %s\n\n", Cliente[i].dataCriacao);
     }
 }
 
@@ -206,11 +218,9 @@ int MostrarCliente(TCAutomovel Cliente[], char nome[], int total) {
             printf("Numero De Cliente: %03d\n", Cliente[i].numero_de_cliente);
             printf("Nome: %s\n", Cliente[i].nome);
             printf("NIF: %s\n", Cliente[i].NIF);
-            printf("Valor Total Compras: %.6f\n", Cliente[i].valor_total_compras);
+            printf("Valor Total Compras: %.2f euros\n", Cliente[i].valor_total_compras);
             printf("Tipo De Cliente: %s\n", imprimir_tipo(Cliente[i].tipo));
-            printf("Data De Registo: %02d:%02d:%04d", Cliente[i].data.dia_registo,
-                Cliente[i].data.mes_registo,
-                Cliente[i].data.ano_registo);
+            printf("Data De Registo: %s\n\n", Cliente[i].dataCriacao);
             break; 
         }
     }
@@ -221,22 +231,46 @@ int MostrarCliente(TCAutomovel Cliente[], char nome[], int total) {
 }
 
 
-int GravarCliente() {
+int GravarCliente(TCAutomovel Cliente[],int total) {
     FILE* fp;
+    int i, ch;
 
-
-    if ((fp = fopen("clientes.bin", "rb")) == NULL) {
-        fp = fopen("clientes.bin", "wb");
-        return 2;
-    }
-    else {
-        fclose(fp);
-        fp = fopen("clientes.bin", "ab");
-        return 3;
+    fp = fopen("clientes.bin", "wb");
+    if (fp == NULL) {
+        return -1;
     }
 
+    fwrite(&total, sizeof(int), 1, fp);
 
-
+    for (int i = 0; i < total; i++) {
+        if(fwrite(&Cliente[i], sizeof(TCAutomovel), 1, fp) != 1) {
+            printf("\nErro ao guardar clientes.\n\n");
+        }
+    }
     fclose(fp);
-    return 0;
+    printf("\nClientes gravados com sucesso.\n\n");
 }
+
+int LerClientes(TCAutomovel Cliente[]) {
+        FILE* fp;
+        int total;
+
+        if ((fp = fopen("clientes.bin", "rb")) == NULL) {
+            return 0;
+        }
+
+        if (fread(&total, sizeof(int), 1, fp) != 1) {
+            fclose(fp);
+            return 0;
+        }
+
+        for (int i = 0; i < total; i++) {
+            if (fread(&Cliente[i], sizeof(TCAutomovel), 1, fp) != 1) {
+                fclose(fp);
+                return i;
+            }
+        }
+
+        fclose(fp);
+        return total;
+    }
