@@ -16,30 +16,6 @@ void obterDataAtual(char* buffer, size_t tamanho) {
     strftime(buffer, tamanho, "%d-%m-%Y %H:%M", tempoLocal);
 }
 
-int validar_data(int dia, int mes, int ano) {
-
-    int ano_atual = 2024;
-    if (ano != ano_atual) {
-        return 0;
-    }
-
-    if (mes < 1 || mes > 12) {
-        return 0;
-    }
-
-    int dias_por_mes[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-    if ((ano % 4 == 0 && ano % 100 != 0) || (ano % 400 == 0)) {
-        dias_por_mes[1] = 29;
-    }
-
-    if (dia < 1 || dia > dias_por_mes[mes - 1]) {
-        return 0; 
-    }
-
-    return 1;
-}
-
 int validar_nome(char *nome) {
     char* pi; int tem = 1;
 
