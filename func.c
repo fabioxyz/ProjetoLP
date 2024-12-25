@@ -1,8 +1,8 @@
 #include "head.h"
 #include <stdio.h> 
 #include <ctype.h>  // Para isdigit()
-#define TMAX 50 // maximo tamanho nome
 #include <time.h>
+#include <locale.h> // . ao ler compras
 
 void obterDataAtual(char* buffer, size_t tamanho) {
     time_t agora;
@@ -15,27 +15,6 @@ void obterDataAtual(char* buffer, size_t tamanho) {
     // Formatar a data no formato "dd-mm-yyyy hh:mm"
     strftime(buffer, tamanho, "%d-%m-%Y %H:%M", tempoLocal);
 }
-
-typedef enum {
-    Regular = 1,
-    Esporadico,
-    Ocasional
-}Tipo_de_cliente;
-
-typedef struct {
-    int dia_registo;
-    int mes_registo;
-    int ano_registo;
-}Data_Registro;
-
-typedef struct {
-    int numero_de_cliente;
-    char nome[50];
-    char NIF[10];
-    float valor_total_compras;
-    Tipo_de_cliente tipo;
-    char dataCriacao[20]; // Armazena a data e hora no formato "dd-mm-yyyy hh:mm"
-}TCAutomovel;
 
 int validar_data(int dia, int mes, int ano) {
 
@@ -75,6 +54,17 @@ int validar_nome(char *nome) {
         }
     }
     return tem;
+}
+
+
+int verificar_nome_existente(TCAutomovel Cliente[], int totalClientes, char *nome) {
+
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(Cliente[i].nome, nome) == 0) {
+            return 0; // Nome já existe
+        }
+    }
+    return 1; // Nome não encontrado
 }
 
 int validar_nif(char* nif) {
@@ -122,15 +112,15 @@ int MENU() {
         scanf("%d", &opcao);
 
         if (opcao == 0) {
-            printf("Certifique se que salvou os dados, deseja sair mesmo assim?\n");
-            printf("0)Para sair  1)Para voltar ao menu\n - ");
+            printf("\nCertifique se que salvou os dados, deseja sair mesmo assim?\n");
+            printf("0)Para sair  1)Para voltar ao menu\n\n - ");
             scanf("%d", &opcao);
             if (opcao == 0) {
                 printf("\nA sair..\n");
                 break;
             }
             else {
-                opcao = 6;
+                opcao = 7;
             }
         }
         else if (opcao > 5 || opcao < 0) {
@@ -153,12 +143,18 @@ int InsereCliente(TCAutomovel Cliente[],int total) {
     printf("\nNumero de Cliente : %03d\n", Cliente[i].numero_de_cliente);
 
     do {
+        do {
         certo = 1;
         printf("Nome : ");
-        gets(Cliente[i].nome);
-        certo = validar_nome(Cliente[i].nome);
+       gets(Cliente[i].nome);
 
+        certo = verificar_nome_existente(Cliente, total, Cliente[i].nome);
+        if (certo == 0) printf("Ja existe um cliente com esse nome.\n");
+        } while (certo != 1);
+
+        certo = validar_nome(Cliente[i].nome);
         if (certo == 0) printf("Insira um nome valido (apenas letras e espacos).\n");
+
     } while (certo != 1);
 
     //nif
@@ -170,9 +166,12 @@ int InsereCliente(TCAutomovel Cliente[],int total) {
     } while (certo != 1);
 
     //compras
+    // Definir locale para português (com vírgula como separador decimal) ao ler valor
+    setlocale(LC_NUMERIC, "pt_PT");
     do {
         printf("Valor total de compras(euros) : ");
         if (scanf("%f", &Cliente[i].valor_total_compras) != 1) {
+            while (getchar() != '\n');
             printf("Insira uma opcao valida.\n");
         }
         } while (Cliente[i].valor_total_compras < 0);
@@ -182,8 +181,12 @@ int InsereCliente(TCAutomovel Cliente[],int total) {
             printf("Tipo de Cliente:  1) Regular | 2)Esporadico | 3)Ocasional\n - ");
             if (scanf("%d", &Cliente[i].tipo) != 1) {
                 printf("Insira uma opcao valida.\n");
+                getchar();
             }
-            getchar();
+            else if (Cliente[i].tipo < 1 || Cliente[i].tipo > 3) {
+                printf("Insira uma opcao valida\n");
+            }
+
         } while (Cliente[i].tipo < 1 || Cliente[i].tipo > 3);
 
         // data
@@ -220,8 +223,7 @@ int MostrarCliente(TCAutomovel Cliente[], char nome[], int total) {
             printf("NIF: %s\n", Cliente[i].NIF);
             printf("Valor Total Compras: %.2f euros\n", Cliente[i].valor_total_compras);
             printf("Tipo De Cliente: %s\n", imprimir_tipo(Cliente[i].tipo));
-            printf("Data De Registo: %s\n\n", Cliente[i].dataCriacao);
-            break; 
+            printf("Data De Registo: %s\n\n", Cliente[i].dataCriacao);           
         }
     }
     if (!encontrou) { 
