@@ -24,7 +24,7 @@ Caso tenhas um compilador de C (como o GCC) instalado:
 
 1. Clona o repositório:
    ```bash
-   git clone [https://github.com/fabioxyz/NOME-DO-REPO.git](https://github.com/fabioxyz/ProjetoLP.git)
+   git clone [https://github.com/fabioxyz/ProjetoLP.git](https://github.com/fabioxyz/ProjetoLP.git)
 
 
  ****ProjetoLP - ESTA INCOMPLETO // FALTA PROCURAR POR TIPO E GRAVAR NUM FICHEIRO****
