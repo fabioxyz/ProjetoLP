@@ -1,4 +1,4 @@
-# 📂 Sistema de Gestão de Clientes (C)
+# 📂 Sistema de Gestão de Clientes BASICO (C)
 
 Este é um programa desenvolvido em **C** para a gestão e armazenamento de informações de clientes. O sistema permite a manipulação de dados em memória e a sua persistência através da gravação em ficheiros de texto/binários.
 
