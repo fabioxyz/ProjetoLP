@@ -1,30 +1,22 @@
-# 📂 Sistema de Gestão de Clientes BASICO (C)
+# Sistema de Gestão de Clientes em C
 
-Este é um programa desenvolvido em **C** para a gestão e armazenamento de informações de clientes. O sistema permite a manipulação de dados em memória e a sua persistência através da gravação em ficheiros de texto/binários.
+Aplicação de terminal para registar, listar e pesquisar clientes. O projeto foi criado para praticar estruturas, arrays, pesquisa de dados e persistência em ficheiros.
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
-O programa utiliza um menu interativo com as seguintes opções:
-1. **Inserir Informação:** Registo de novos clientes no sistema.
-2. **Listar Registos:** Exibição de todos os clientes atualmente armazenados.
-3. **Procurar por Nome:** Filtro de pesquisa rápida por nome de cliente.
-4. **Procurar por Tipo:** Filtro de clientes com base na sua categoria (ex: Premium, Regular).
-5. **Gravar em Ficheiro:** Persistência de dados para garantir que as informações não se percam ao fechar o programa.
-0. **Sair:** Encerramento seguro da aplicação.
+- Inserção de clientes
+- Listagem de registos
+- Pesquisa por nome
+- Pesquisa por tipo *(em desenvolvimento)*
+- Gravação em ficheiro *(em desenvolvimento)*
 
-## 🛠️ Conceitos de Programação Aplicados
-* **Estruturas (Structs):** Organização dos dados do cliente (Nome, ID, Tipo, etc.).
-* **Arrays/Listas:** Manipulação de conjuntos de dados.
-* **Manipulação de Ficheiros:** Uso de `fopen`, `fprintf`/`fwrite` para guardar dados permanentemente.
-* **Algoritmos de Pesquisa:** Lógica de comparação de strings (`strcmp`) para filtros de busca.
+## Compilação
 
-## 💻 Como Compilar e Executar
+```bash
+gcc *.c -o gestao-clientes
+./gestao-clientes
+```
 
-Caso tenhas um compilador de C (como o GCC) instalado:
+## Estado
 
-1. Clona o repositório:
-   ```bash
-   git clone [https://github.com/fabioxyz/ProjetoLP.git](https://github.com/fabioxyz/ProjetoLP.git)
-
-
- ****ProjetoLP - ESTA INCOMPLETO // FALTA PROCURAR POR TIPO E GRAVAR NUM FICHEIRO****
+Projeto académico em desenvolvimento. As funcionalidades assinaladas acima ainda não estão concluídas.
